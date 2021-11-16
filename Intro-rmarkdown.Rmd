@@ -1,0 +1,65 @@
+---
+title: "Intro - Rmarkdown NCEAS November 2021 workshop"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE) 
+
+#notes: 
+#change the settings throughout all the chunks using this function. echo=TRUE shows code. echo=FALSe removes the code from all chunks.
+```
+
+# Libraries
+- include all of your library calls at the top. 
+- use install.packages to install functions. 
+- just include the libraries that get used in the script. It makes it easier for collaboration, if people know what libraries are actually needed. It also makes debugging really annoying if you make someone download all these extra libraries. 
+
+```{r}
+library(readr) # used to load data ; read_csv()
+
+```
+
+
+# Introduction
+
+- reading in the data
+```{r read-data, message=FALSE}
+ # https://doi.org/10.18739/A25T3FZ8X
+bg_chem<-read_csv("data/BGchem2008data.csv") #read_csv is better for importing csv because it does better at parsing column types, its much faster than read.csv, and it also defaults to no "strings as factors"
+
+#Use write_csv instead of write.csv because the latter will add a unique rownames column which makes problems for output datasets multiple times. 
+
+summary(bg_chem)
+
+```
+
+
+# Analysis
+
+- calculate summary statistics
+```{r}
+# $ is considered the list operator selector
+nitrate <- mean(bg_chem$NO3)
+nitrite <- mean(bg_chem$NO2)
+amm <- mean(bg_chem$NH4)
+phos <- mean(bg_chem$P)
+```
+
+- calculate mean Redfield ratio
+```{r}
+ratio<-(nitrate + nitrite + amm)/phos
+
+#notes: 
+#it makes sense to break up your analyses into separate chunks so to give you a chance to run things incrementally. And also to document what does into each logical step. One chunk per data processing step. One plot per chunk. 
+#can include inline text as  `r funtion()` outside of the r code chunk
+```
+
+
+The calculated Redfield ratio is `r round(ratio,2)`
+
+- plot redfield ratio 
+```{r}
+plot(bg_chem$P,bg_chem$NO2+bg_chem$NO3+bg_chem$NH4)
+```
+
