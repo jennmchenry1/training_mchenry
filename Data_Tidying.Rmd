@@ -1,0 +1,129 @@
+---
+title: "Data Tidying"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# notes: YOU CAN MAKE YOUR PARENTHESIS RAINBOW BY GOING GLOBAL OPTIONS-> CODE-> DISPLAY->RAINBOW PARENTHESIS
+
+# Library Calls
+```{r}
+library(dplyr)
+library(readr)
+library(tidyr)
+```
+
+# Data Sources
+- read in the data
+```{r}
+
+catch_original <- read_csv("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.302.1",show_col_types = TRUE)
+```
+
+
+# Clean and Reshape data
+- remove unnecessary columns
+- check column typing
+- reshape data
+
+Remove columns for all and notes
+```{r}
+catch_data <- catch_original %>% 
+  select(-All, -notesRegCode)
+
+head(catch_data)
+
+glimpse(catch_data)
+```
+
+Coerce Chinook column into a numeric instead of a character
+```{r}
+catch_clean <-catch_original%>%
+  mutate(Chinook= as.numeric(Chinook))
+
+```
+
+Locating the row that's throwing an NA value
+```{r}
+i <- which(is.na(catch_clean$Chinook))
+
+i
+
+catch_original[i,]
+
+```
+
+Replacing the value that's creating an NA
+```{r}
+catch_clean <- catch_data %>% 
+  mutate(Chinook = if_else(Chinook == "I", "1", Chinook)) %>% 
+  mutate(Chinook = as.integer(Chinook))
+
+head(catch_clean)
+summary(catch_clean)
+```
+
+Reshaping the data longer
+```{r}
+catch_long<- catch_clean%>%
+  pivot_longer(cols=-c(Region,Year),names_to = "Species",values_to="Catch" )
+
+head(catch_long)
+```
+
+Reshaping the data wider
+```{r}
+catch_wide<-catch_long %>%
+  pivot_wider(names_from = "Region",values_from = "Catch")
+
+
+```
+
+```{r}
+catch_long<-catch_long %>%
+  rename(Catch_thousands = Catch)%>%
+  mutate(Catch = Catch_thousands * 1000)%>%
+  select(-Catch_thousands)
+
+head(catch_long)
+```
+
+
+# Split -apply -combine
+```{r}
+mean_region<-catch_long %>%
+  group_by(Region)%>%
+  summarise(catch_mean=mean(Catch),
+            n = n())
+
+mean_region
+
+mean_year<-catch_long%>%
+  group_by(Year)%>%
+  summarise(catch_mean=mean(Catch),
+            n = n())
+
+mean_year
+
+mean_spp<-catch_long%>%
+  group_by(Species)%>%
+  summarise(catch_mean=mean(Catch),
+            n = n())
+mean_spp
+
+var<-catch_long%>%
+  filter(Year > 1899)%>%
+  group_by(Species)%>%
+  summarise(catch_mean=mean(Catch), .groups="drop")%>%
+  arrange(-catch_mean)
+
+var
+```
+
+# Join to Regions dataset
+```{r}
+```
+
