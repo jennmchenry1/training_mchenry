@@ -55,7 +55,10 @@ ggplot(annual_esc, mapping = aes(x = Species, y = escapement, fill = SASAP.Regio
 ```{r}
 my_theme <- theme_classic() +
   theme(legend.position = "bottom")
-{r}
+```
+
+
+```{r}
 annual_esc %>% 
   filter(SASAP.Region == "Kodiak") %>% 
   ggplot(mapping = aes(x = year, y = escapement, color = Species)) +
