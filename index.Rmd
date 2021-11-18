@@ -8,4 +8,5 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 [Data Analysis](Data_Tidying.html)
+
 [Data Vis](Data_Visualization.html)
