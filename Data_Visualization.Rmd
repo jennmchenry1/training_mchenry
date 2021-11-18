@@ -104,4 +104,10 @@ leaflet(locs) %>%
                    color = "white",
                    opacity = 1)
 ```
+# Plotly
+```{r}
+can create interactive plots with github pages using plotly
+
+https://plotly.com/r/
+```
 
